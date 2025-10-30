@@ -68,7 +68,9 @@ int main() {
 
 ### 測試案例
 
-Enter first polynomial:
+| 測試案例 | 輸入參數 $m,n$ | 預期輸出 | 實際輸出 |
+|----------|--------------|----------|----------|
+|   Enter first polynomial:
 Enter number of terms: 3
 Enter coefficient and exponent: 2 2
 Enter coefficient and exponent: 3 1
@@ -77,13 +79,10 @@ Enter second polynomial:
 Enter number of terms: 2
 Enter coefficient and exponent: 1 2
 Enter coefficient and exponent: 4 0
-輸出
-P1(x) = 2x^2 + 3x + 1
-P2(x) = 1x^2 + 4
-P1 + P2 = 3x^2 + 3x + 5
-P1 * P2 = 2x^4 + 3x^3 + 9x^2 + 12x + 4
-Enter a value of x to evaluate P1: 2
-P1(2) = 15
+      |         |      |
+|         |         |      |
+|          |        |        |
+|        |        |       |
 
 ```
 ```

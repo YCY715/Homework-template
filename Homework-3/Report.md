@@ -1,1 +1,152 @@
 
+# 41343137
+
+作業3
+
+## 解題說明
+
+多項式的建立與輸入
+多項式的加法（Add）
+多項式的乘法（Mult）
+多項式的輸出（含正負號判斷）
+多項式的代入運算（Eval）
+用物件導向方式設計，建立 Term 類別儲存單項式（coef與exp），再由 Polynomial 類別管理所有非零項。
+多項式的運算（+、*、代入）皆以項目為單位計算，並使用動態陣列 (new / delete[]) 來管理項數。
+### 舉例
+
+若
+P1(x) = 2x² + 3x + 1
+P2(x) = x² + 4
+
+則
+P1 + P2 = 3x² + 3x + 5
+P1 × P2 = 2x⁴ + 3x³ + 9x² + 12x + 4
+## 程式實作
+
+以下為主要程式碼：
+
+```cpp
+// Example main function
+int main() {
+    Polynomial p1, p2;
+
+    cout << "Enter first polynomial:\n";
+    cin >> p1;
+    cout << "Enter second polynomial:\n";
+    cin >> p2;
+
+    cout << "\nP1(x) = " << p1 << endl;
+    cout << "P2(x) = " << p2 << endl;
+
+    Polynomial sum = p1.Add(p2);
+    Polynomial prod = p1.Mult(p2);
+
+    cout << "\nP1 + P2 = " << sum << endl;
+    cout << "P1 * P2 = " << prod << endl;
+
+    float x;
+    cout << "\nEnter a value of x to evaluate P1: ";
+    cin >> x;
+    cout << "P1(" << x << ") = " << p1.Eval(x) << endl;
+
+    return 0;
+}
+
+```
+
+## 效能分析
+
+| 操作          | 時間複雜度    | 空間複雜度        | 說明          |
+| ----------- | -------- | ------------ | ----------- |
+| `AddTerm()` | O(n)     | O(1)         | 需檢查是否有相同指數  |
+| `Add()`     | O(n + m) | O(max(n, m)) | 對兩多項式逐項相加   |
+| `Mult()`    | O(n × m) | O(n + m)     | 每項相乘再合併同類項  |
+| `Eval()`    | O(n)     | O(1)         | 依次計算每項次方和加總 |
+
+
+## 測試與驗證
+
+### 測試案例
+
+| 輸入 |  |  |  |
+|----------|--------------|----------|----------|
+|   Enter first polynomial:
+Enter number of terms: 3
+Enter coefficient and exponent: 2 2
+Enter coefficient and exponent: 3 1
+Enter coefficient and exponent: 1 0
+Enter second polynomial:
+Enter number of terms: 2
+Enter coefficient and exponent: 1 2
+Enter coefficient and exponent: 4 0
+      | 輸出        |      
+|            P1(x) = 2x^2 + 3x + 1
+P2(x) = 1x^2 + 4
+
+P1 + P2 = 3x^2 + 3x + 5
+P1 * P2 = 2x^4 + 3x^3 + 9x^2 + 12x + 4
+
+Enter a value of x to evaluate P1: 2
+P1(2) = 15
+      |              
+
+```
+```
+
+### 效能量測
+以輸入項數從 10、100、1000 測試
+
+加法時間約隨項數線性增加
+乘法時間為平方級增長（因每項需與另一多項式全部項相乘）
+記憶體使用量主要取決於 termArray 大小
+
+
+   
+
+## 心得討論
+
+### 這次程式重點
+
+1. **物件導向的封裝與模組化設計**  
+每個多項式都用 Polynomial 物件表示，內部包含動態陣列 termArray 來存放項目，並透過 AddTerm()、Add()、Mult() 等成員函式完成多項式的加法與乘法。這種封裝方式能有效管理資料，減少程式間的耦合度，讓主程式 main() 部分變得非常簡潔。
+2. **動態記憶體配置與陣列擴充**  
+程式使用 new 和 delete[] 來管理記憶體，並在項數超出容量時自動擴充。
+
+3. **運算子多載實作**  
+   這份程式中，利用 friend 函式多載了 >> 和 <<，讓輸入與輸出多項式時更自然。特別是輸出函式中，透過判斷正負號與排序（降冪輸出），輸出格式比較符合我們正常寫的方式，也讓我學會如何在程式中處理符號與格式問題。
+  
+**自己覺得的困難點**
+動態記憶體的管理因為整個程式沒用 STL 的 vector，而是用原生的 new / delete[] 來動態配置空間。
+困難在於：需要手動檢查陣列是否已滿；
+
+複製多項式時要避免淺層複製版本例如:只會複製指標 termArray 的位址（不是內容）。結果 p1 和 p2 都指向同一塊記憶體。
+
+這樣當程式結束時：
+p1 解構 → delete[] termArray;
+p2 解構 → 又 delete[] termArray;
+ 重複釋放記憶體 → 發生 Segmentation Fault
+
+每次擴充容量要確保舊資料正確搬移，並釋放舊空間。
+
+如果沒在適當時機 delete[] 舊的 termArray，就會造成「記憶體洩漏」，雖然程式表面沒當機，電腦記憶體也會越來越吃重。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+

@@ -106,27 +106,16 @@ void AddTerm(double c, int e) {
 
 ### 測試案例
 
-| 輸入 |  |  |  |
-|----------|--------------|----------|----------|
-|   Enter first polynomial:
-Enter number of terms: 3
-Enter coefficient and exponent: 2 2
-Enter coefficient and exponent: 3 1
-Enter coefficient and exponent: 1 0
-Enter second polynomial:
-Enter number of terms: 2
-Enter coefficient and exponent: 1 2
-Enter coefficient and exponent: 4 0
-      | 輸出        |      
-|            P1(x) = 2x^2 + 3x + 1
-P2(x) = 1x^2 + 4
+| 測試案例 | 輸入參數  |  實際輸出 |
 
-P1 + P2 = 3x^2 + 3x + 5
-P1 * P2 = 2x^4 + 3x^3 + 9x^2 + 12x + 4
-
-Enter a value of x to evaluate P1: 2
-P1(2) = 15
-      |              
+|   3
+    1 2 4 1 3 0
+    2
+    1 5 2 2   |2
+    |
+|  | $m=1,n=2$      | 4        | 4       |
+|    | $m=2,n=3$      | 9        | 9        |
+|    | $m=3,n=2$      | 29       | 29       |
 
 ```
 ```

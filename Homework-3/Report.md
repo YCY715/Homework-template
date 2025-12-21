@@ -25,6 +25,7 @@
 ## 程式實作
 
 以下為主要程式碼片段：
+
 1.Polynomial 的表示方式     
 ```cpp
 class Polynomial {

@@ -25,7 +25,7 @@
 ## 程式實作
 
 以下為主要程式碼片段：
-Polynomial 的表示方式     
+1.Polynomial 的表示方式     
 ```cpp
 class Polynomial {
 private:
@@ -43,23 +43,65 @@ head 是 錨點（sentinel）
 串列永遠是環狀，不會有 nullptr
 插入、刪除邏輯一致，避免特例處理
 
+2.節點回收機制（Available List)
+```cpp
+static ChainNode<T>* GetNode(const T& x, ChainNode<T>* link) {
+    if (avail) {
+        ChainNode<T>* n = avail;
+        avail = avail->link;
+        n->data = x;
+        n->link = link;
+        return n;
+    }
+    return new ChainNode<T>(x, link);
+}
+```
+說明:
+減少 new / delete
+回收節點供下次使用
+在多項式乘法裡面能有效提升效能
 
+3.核心函式：AddTerm()
+```cpp
+void AddTerm(double c, int e) {
+    if (c == 0) return;
 
+    ChainNode<Term>* prev = head;
+    ChainNode<Term>* cur = head->link;
 
+    while (cur != head && cur->data.exp > e) {
+        prev = cur;
+        cur = cur->link;
+    }
 
-
-
+    if (cur != head && cur->data.exp == e) {
+        cur->data.coef += c;
+        if (fabs(cur->data.coef) < 1e-9) {
+            prev->link = cur->link;
+            AvailableList<Term>::ReturnNode(cur);
+        }
+    } else {
+        prev->link = AvailableList<Term>::GetNode(Term(c, e), cur);
+    }
+}
+```
+說明:
+維持 指數遞減排序
+自動合併同次方
+係數為 0 → 刪除節點
+其他運算全部建立在這個函式上
 
 ## 效能分析
-
+多項式 A 有 m 項
+多項式 B 有 n 項
 | 操作          | 時間複雜度    | 空間複雜度        | 說明          |
 | ----------- | -------- | ------------ | ----------- |
-| `AddTerm()` | O(n)     | O(1)         | 需檢查是否有相同指數  |
-| `Add()`     | O(n + m) | O(max(n, m)) | 對兩多項式逐項相加   |
-| `Mult()`    | O(n × m) | O(n + m)     | 每項相乘再合併同類項  |
-| `Eval()`    | O(n)     | O(1)         | 依次計算每項次方和加總 |
-
-
+| `AddTerm(c, e)` | O(k)    | O(1)         | 最壞情況：走完整條串列 |
+| `多項式加法 A + B`     | O(n + m) | O(m + n)| 每一項最多被走一次 |
+| `多項式減法 A - B`    | O(m + n)|  O(1)   | 先將 B 的係數取負，再進行加法  |
+| `多項式乘法 A * B`    | O(m × n)     |   O(1)          | 為多項式運算中最昂貴的部分 |
+| `Evaluate(x)`    | O(m)     |   O(1)      | 走訪所有項目    |
+| `Available List`    | 節點回收與取得：O(1))     |   減少 new/delete 次數      | 在大量節點新增/刪除時效能明顯提升    |
 ## 測試與驗證
 
 ### 測試案例

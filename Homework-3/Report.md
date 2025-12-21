@@ -158,9 +158,13 @@ assignment operator,
 destructor,
 避免記憶體共用錯誤。
 
-5. **Available List**
-手動管理節點回收,
-提升效能。
+5. **Available List**(重要)
+是一個「可重複使用的節點池,用來存放已刪除但尚未釋放的節點，以減少頻繁的 new / delete。
+多項式運算（尤其是乘法）會：不斷產生新節點又會因為「合併同次方」刪掉節點節點,生命週期很短。
+如果每次都new,delete會產生：大量 heap, 操作效能下降,記憶體碎片化
+
+
+
 
 **自己覺得的困難點**
 
@@ -178,7 +182,7 @@ c.AddTerm(p->data.coef * q->data.coef,
 ```cpp
 AvailableList<Term>::ReturnNode(cur);
 ```
-統一回收機制,Clear() 與刪節點都使用它
+統一回收機制,Clear() 與刪節點都使用它。
 
 
 

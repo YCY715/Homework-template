@@ -12,47 +12,43 @@
 多項式的代入運算（Eval）
 用物件導向方式設計，建立 Term 類別儲存單項式（coef與exp），再由 Polynomial 類別管理所有非零項。
 多項式的運算（+、*、代入）皆以項目為單位計算，並使用動態陣列 (new / delete[]) 來管理項數。
-### 舉例
+### 定義 Term 類別，表示一項多項式
 
-若
-P1(x) = 2x² + 3x + 1
-P2(x) = x² + 4
+使用 ChainNode<Term> 建立 circular linked list
+實作 AddTerm()，確保：
+串列依指數排序
+同次方自動合併
+所有運算（+ − *）都基於 AddTerm()
+利用 AvailableList 回收節點，減少記憶體配置成本
 
-則
-P1 + P2 = 3x² + 3x + 5
-P1 × P2 = 2x⁴ + 3x³ + 9x² + 12x + 4
+
 ## 程式實作
 
-以下為主要程式碼：
-
+以下為主要程式碼片段：
+Polynomial 的表示方式     
 ```cpp
-// Example main function
-int main() {
-    Polynomial p1, p2;
-
-    cout << "Enter first polynomial:\n";
-    cin >> p1;
-    cout << "Enter second polynomial:\n";
-    cin >> p2;
-
-    cout << "\nP1(x) = " << p1 << endl;
-    cout << "P2(x) = " << p2 << endl;
-
-    Polynomial sum = p1.Add(p2);
-    Polynomial prod = p1.Mult(p2);
-
-    cout << "\nP1 + P2 = " << sum << endl;
-    cout << "P1 * P2 = " << prod << endl;
-
-    float x;
-    cout << "\nEnter a value of x to evaluate P1: ";
-    cin >> x;
-    cout << "P1(" << x << ") = " << p1.Eval(x) << endl;
-
-    return 0;
-}
-
+class Polynomial {
+private:
+    ChainNode<Term>* head;   // header node（不存資料）
+};
 ```
+```cpp
+Polynomial::Polynomial() {
+    head = new ChainNode<Term>();
+    head->link = head;       // circular list
+}
+```
+說明:
+head 是 錨點（sentinel）
+串列永遠是環狀，不會有 nullptr
+插入、刪除邏輯一致，避免特例處理
+
+
+
+
+
+
+
 
 ## 效能分析
 

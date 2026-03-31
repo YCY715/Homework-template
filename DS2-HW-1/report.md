@@ -169,40 +169,52 @@ O(log n)
 ## 測試與驗證
 
 ### 測試案例
-
-| 輸入 |  |  |  |
+(a)
+| 測試案例 |n| Height | Ratio |
 |----------|--------------|----------|----------|
-|   Enter first polynomial:
-Enter number of terms: 3
-Enter coefficient and exponent: 2 2
-Enter coefficient and exponent: 3 1
-Enter coefficient and exponent: 1 0
-Enter second polynomial:
-Enter number of terms: 2
-Enter coefficient and exponent: 1 2
-Enter coefficient and exponent: 4 0
-      | 輸出        |      
-|            P1(x) = 2x^2 + 3x + 1
-P2(x) = 1x^2 + 4
+| 測試一   | 100      | 14        | 2.10      |
+| 測試二   | 500      | 18        | 2.00       |
+| 測試三   | 1000      | 20        | 2.00        |
+| 測試四   | 3000      | 25       | 2.16       |
 
-P1 + P2 = 3x^2 + 3x + 5
-P1 * P2 = 2x^4 + 3x^3 + 9x^2 + 12x + 4
+結果說明：
 
-Enter a value of x to evaluate P1: 2
-P1(2) = 15
-      |              
+Ratio 大致維持在 2 左右
+符合理論預期
 
+### 測試案例
+(b)
 ```
+輸入:
+插入：50 30 70 20 40 60 80
+刪除：50
+
+輸出:
+原始 BST: 20 30 40 50 60 70 80
+刪除後:   20 30 40 60 70 80
 ```
+說明：
+
+刪除節點 50（兩個子節點）
+使用右子樹最小值 60 取代
+
 
 ### 效能量測
-以輸入項數從 10、100、1000 測試
+(a)
 
-加法時間約隨項數線性增加
-乘法時間為平方級增長（因每項需與另一多項式全部項相乘）
-記憶體使用量主要取決於 termArray 大小
+針對不同 n（100 ~ 10000），量測：
 
+BST 高度（height）
+比值：height / log₂(n)
 
+並觀察其趨勢是否接近常數。
+
+(b)
+
+針對刪除操作，分析其時間複雜度（不需實際量測）：
+
+平均情況：O(log n)
+最壞情況：O(n)
    
 
 ## 心得討論

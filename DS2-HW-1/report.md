@@ -32,41 +32,119 @@ log₂(5) ≈ 2.32
 height = 3
 此例中：height / log₂(n) ≈ 3 / 2.32 ≈ 1.29
 
+目的
+
+透過大量隨機資料（n = 100 ~ 10000）觀察：
+👉
+height / log₂(n) 是否接近常數（約 2）
+若成立，表示 BST 高度 ≈ O(log n)
+
+b部分
+情況 1：葉節點（無子節點）
+    
+         50
+        /
+      30
+
+刪除30
+
+50
+直接刪除即可
+情況 2：只有一個子節點
+
+
+       50
+      /
+    30
+     \
+      40
+
+ 刪除 30：     
+
+       50
+      /
+    40
+
+
+用子節點（40）取代
+
+
+情況 3：有兩個子節點
+
+           50
+          /  \
+        30    70
+       / \   / \
+      20 40 60 80
+
+找右子樹最小值 → 60
+用 60 取代 50
+刪除原本的 60
+
+結果
+
+          60
+         /  \
+       30    70
+      / \     \
+     20 40     80
 
 
 ## 程式實作
 
 以下為主要程式碼：
-
+(a) 插入與高度維護
 ```cpp
-// Example main function
-int main() {
-    Polynomial p1, p2;
+Node* insert(Node* node, int key) {
+    if (!node) return new Node(key);
 
-    cout << "Enter first polynomial:\n";
-    cin >> p1;
-    cout << "Enter second polynomial:\n";
-    cin >> p2;
+    if (key < node->key)
+        node->left = insert(node->left, key);
+    else
+        node->right = insert(node->right, key);
 
-    cout << "\nP1(x) = " << p1 << endl;
-    cout << "P2(x) = " << p2 << endl;
+    // 更新高度（避免重算整棵樹）
+    node->height = max(getHeight(node->left), getHeight(node->right)) + 1;
 
-    Polynomial sum = p1.Add(p2);
-    Polynomial prod = p1.Mult(p2);
-
-    cout << "\nP1 + P2 = " << sum << endl;
-    cout << "P1 * P2 = " << prod << endl;
-
-    float x;
-    cout << "\nEnter a value of x to evaluate P1: ";
-    cin >> x;
-    cout << "P1(" << x << ") = " << p1.Eval(x) << endl;
-
-    return 0;
+    return node;
 }
 
 ```
+說明：
+此方法將高度儲存在節點中，使得查詢高度時間複雜度從 O(n) 降為 O(1)。
 
+(b) 刪除節點核心
+```cpp
+void remove(Node*& node, int key) {
+    if (!node) return;
+
+    if (key < node->key)
+        remove(node->left, key);
+    else if (key > node->key)
+        remove(node->right, key);
+    else {
+        if (!node->left) {
+            Node* temp = node;
+            node = node->right;
+            delete temp;
+        }
+        else if (!node->right) {
+            Node* temp = node;
+            node = node->left;
+            delete temp;
+        }
+        else {
+            Node* temp = node->right;
+            while (temp->left)
+                temp = temp->left;
+
+            node->key = temp->key;
+            remove(node->right, temp->key);
+        }
+    }
+}
+
+```
 ## 效能分析
 
 | 操作          | 時間複雜度    | 空間複雜度        | 說明          |

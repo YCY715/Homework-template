@@ -13,63 +13,79 @@
 Merge Sort：使用「逆向構造法（Working backward）」，透過奇偶項交錯拆分，構造出能讓迭代版合併排序在每次 Merge 時都發生最高比較次數的極端數列。
 
 Quick Sort & Heap Sort：遵照投影片規範，對於同一個 $n$ 值，隨機打亂並測試至少 10 次（本實驗採 15 次）不同的排列，並從中抽取出「最大執行時間（Max time）」作為最壞情況的代表。
+
+3.複合式排序設計（Composite Sort）：綜合演算法理論，在 $n$ 極小時（如 $n < 20$），Insertion Sort 由於常數極小且不需額外記憶體，速度最快；當 $n$ 變大時，應果斷切換至具備穩定 $O(n \log n)$ 且常數較小的 Heap Sort，以防止 Quick/Insertion 退化至 $O(n^2)$。
+
+
 ## 程式實作
 
 以下為主要程式碼：
-(a) 插入與高度維護
+1. 迭代版合併排序 (Iterative Merge Sort)
+為符合投影片中「不使用遞迴（Non-recursive）」的要求，採用由底向上的迭代設計，利用雙重迴圈逐層加倍合併區間（size *= 2）。
 ```cpp
-Node* insert(Node* node, int key) {
-    if (!node) return new Node(key);
-
-    if (key < node->key)
-        node->left = insert(node->left, key);
-    else
-        node->right = insert(node->right, key);
-
-    // 更新高度（避免重算整棵樹）
-    node->height = max(getHeight(node->left), getHeight(node->right)) + 1;
-
-    return node;
-}
-
-```
-說明：
-此方法將高度儲存在節點中，使得查詢高度時間複雜度從 O(n) 降為 O(1)。
-
-(b) 刪除節點核心
-```cpp
-void remove(Node*& node, int key) {
-    if (!node) return;
-
-    if (key < node->key)
-        remove(node->left, key);
-    else if (key > node->key)
-        remove(node->right, key);
-    else {
-        if (!node->left) {
-            Node* temp = node;
-            node = node->right;
-            delete temp;
-        }
-        else if (!node->right) {
-            Node* temp = node;
-            node = node->left;
-            delete temp;
-        }
-        else {
-            Node* temp = node->right;
-            while (temp->left)
-                temp = temp->left;
-
-            node->key = temp->key;
-            remove(node->right, temp->key);
+void MergeSort(vector<int>& a) {
+    int n = a.size();
+    if (n <= 1) return;
+    vector<int> b(n); // 配置與原陣列等大的暫存輔助空間
+    
+    // size 代表每次合併的子陣列長度 (以 1, 2, 4, 8... 的倍數增長)
+    for (int size = 1; size < n; size *= 2) {
+        for (int l = 0; l < n - 1; l += 2 * size) {
+            int m = min(l + size - 1, n - 1);
+            int r = min(l + 2 * size - 1, n - 1);
+            Merge(a, b, l, m, r);
         }
     }
 }
 
 ```
-說明：
-此為 BST 刪除標準作法，處理三種節點情況。
+
+2. 隨機序列與最大時間獲取 (Quick & Heap Worst-case Testing)
+此片段展示了如何透過重複打亂 15 次，並抓取最高耗時（maxTime）來逼近最壞情況
+
+
+```cpp
+if (sortType == "Quick" || sortType == "Heap") {
+    double maxTime = 0.0;
+    int permutationsCount = 15; // 跑 15 次隨機序列取最大值
+
+    for (int p = 0; p < permutationsCount; p++) {
+        vector<int> baseData(n);
+        for (int i = 0; i < n; i++) baseData[i] = i;
+
+        Permute(baseData, n); // 呼叫投影片 Program 7.20 的隨機打亂
+
+        auto start = chrono::high_resolution_clock::now();
+        for (int r = 0; r < repetitions; r++) {
+            vector<int> testData = baseData; // 還原資料
+            if (sortType == "Quick") QuickSort(testData);
+            else HeapSort(testData);
+        }
+        auto end = chrono::high_resolution_clock::now();
+        double currentAvgTime = chrono::duration<double, milli>(end - start).count() / repetitions;
+
+        if (currentAvgTime > maxTime) maxTime = currentAvgTime; // 取最大值
+    }
+    return maxTime;
+}
+
+```
+
+3. 最終複合式排序函數 (Composite Sort)
+臨界點（Threshold）設為 20，兼顧小資料的低常數優勢與大資料的穩定邊界。
+
+```cpp
+void CompositeSort(vector<int>& a) {
+    int n = a.size();
+    if (n < 20) {
+        InsertionSort(a); // 小資料集下，Insertion Sort 常數小、效率最佳
+    }
+    else {
+        HeapSort(a);      // 大資料集下，穩定維持 O(n log n) 防止退化
+    }
+}
+
+```
 
 ## 效能分析
 

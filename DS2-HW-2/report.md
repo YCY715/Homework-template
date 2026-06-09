@@ -137,6 +137,7 @@ Merge 與 Heap 在最壞情況下的增長曲線非常平緩。值得注意的�
 
 **補充**
 Composite Sort 在 $n$ 很大時沒能超越 Quick Sort？最終數據中，會發現 Composite 雖然比 Heap 快，但依然比 Quick 慢。這是一個非常值得拿出來討論的科學現象：原因分析：Composite Sort 是基於「小於 20 切換成 Insertion，大於等於 20 使用 Heap」的邏輯。雖然 Heap Sort 的最壞情況是穩定的 $O(n \log n)$，但它在底層運算時需要频繁地進行樹狀結構的交換（MaxHeapify），這會破壞 CPU 的快取記憶體在地性（Cache Locality）。相較之下，Quick Sort 雖然也是 $O(n \log n)$，但它的雙指標分割（Partition）是連續線性掃描記憶體，對 CPU 快取極度友善。這證明了：時間複雜度相同的演算法，硬體架構上的常數開銷（Constant Factor）會大幅影響實際速度。
+
 ### 實作上的困難點
 
  **1.迭代版合併排序（Iterative Merge Sort）的邊界控制**

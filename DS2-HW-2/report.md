@@ -12,7 +12,7 @@
 
 Merge Sort：使用「逆向構造法（Working backward）」，透過奇偶項交錯拆分，構造出能讓迭代版合併排序在每次 Merge 時都發生最高比較次數的極端數列。
 
-Quick Sort & Heap Sort：遵照投影片規範，對於同一個 $n$ 值，隨機打亂並測試至少 10 次（本實驗採 15 次）不同的排列，並從中抽取出「最大執行時間（Max time）」作為最壞情況的代表。
+Quick Sort & Heap Sort：遵照投影片規範，對於同一個 $n$ 值，隨機打亂並測試至少 10 次（作業採用 15 次）不同的排列，並從中抽取出「最大執行時間（Max time）」作為最壞情況的代表。
 
 3.複合式排序設計（Composite Sort）：綜合演算法理論，在 $n$ 極小時（如 $n < 20$），Insertion Sort 由於常數極小且不需額外記憶體，速度最快；當 $n$ 變大時，應果斷切換至具備穩定 $O(n \log n)$ 且常數較小的 Heap Sort，以防止 Quick/Insertion 退化至 $O(n^2)$。
 
@@ -106,16 +106,16 @@ void CompositeSort(vector<int>& a) {
 
 ### 效能分析
 1.Insertion Sort 的退化驗證  (O(n^2))：
-從數據可以看出，當 $n$ 從 $1000$ 翻倍到 $2000$，再翻倍到 $4000$ 時，Insertion Sort 的執行時間呈現驚人的 4 倍速度暴增（從約 $19\text{ ms} \rightarrow 73\text{ ms} \rightarrow 296\text{ ms}$）。這在理論上完全符合其最壞情況下的平方複雜度曲線，也證明了純逆序數列確實是其致命的最壞狀況。
+從數據可以看出，當 $n$ 從 $1000$ 翻倍到 $2000$，再翻倍到 $4000$ 時，Insertion Sort 的執行時間呈現 4 倍速度暴增（從約 $19\text{ ms} \rightarrow 73\text{ ms} \rightarrow 296\text{ ms}$）。這在理論上完全符合其最壞情況下的平方複雜度曲線，也證明了純逆序數列確實是其致命的最壞狀況。
 
  2.Quick Sort 搭配三數取中的強健性：
-儘管投影片要求透過 15 次隨機打亂來抓取最大時間，但由於本實作導入了「三數取中法（Median-of-three）」，它極難在隨機排列中挑選到極端的 Pivot。因此，在隨機盲測下，Quick Sort 依然維持極高水準的 $O(n \log n)$ 常數表現，在表格中甚至超越了 Merge 和 Heap，這符合投影片第 3 張所預期的「其他方法可能都比 Quick Sort 慢」的學術現象。
+儘管投影片要求透過 15 次隨機打亂來抓取最大時間，但由於本實作導入了「三數取中法（Median-of-three）」，它極難在隨機排列中挑選到極端的 Pivot。因此，在隨機盲測下，Quick Sort 依然維持極高水準的 $O(n \log n)$ 常數表現，在表格中甚至超越了 Merge 和 Heap，這符合投影片第 3 張所預期的「其他方法可能都比 Quick Sort 慢」的現象。
 
 3.Merge Sort 與 Heap Sort 的時間穩定性：
 Merge 與 Heap 在最壞情況下的增長曲線非常平緩。值得注意的是，Merge 的時間普遍比 Heap 還要快一些，這反映出 Heap Sort 在維持 Heap 結構時（MaxHeapify）的元素交換常數稍微高了一點點；然而 Heap Sort 具備空間複雜度 $O(1)$ 的優勢，而非遞迴版 Merge Sort 則需要額外 $O(n)$ 的記憶體。
 
 4.Composite Sort 複合函數的綜合綜效（Win-Win）：
-觀察 Composite 欄位可以發現，在大小為 $n=1000$ 時，其時間（1.38ms）優於單獨使用 Heap Sort（1.55ms）。這是因為它在子陣列長度小於 20 時，切換成幾乎沒有常數開銷、免維護堆積樹結構的 Insertion Sort，成功將大演算法的理論優勢與小演算法的低常數完美融合。實驗證明，複合式排序成功達到了投影片所要求的「在所有 $n$ 範圍下皆能產生最佳效能」的終極目的。
+觀察 Composite 欄位可以發現，在大小為 $n=1000$ 時，其時間（1.38ms）優於單獨使用 Heap Sort（1.55ms）。這是因為它在子陣列長度小於 20 時，切換成幾乎沒有常數開銷、免維護堆積樹結構的 Insertion Sort，成功將大演算法的理論優勢與小演算法的低常數完美融合。實驗證明，複合式排序成功達到了投影片所要求的「在所有 $n$ 範圍下皆能產生最佳效能」的目的。
 
 ## 心得討論
 
@@ -136,7 +136,8 @@ Merge 與 Heap 在最壞情況下的增長曲線非常平緩。值得注意的�
 論上大資料（n 很大）用 $O(n \log n)$ 的 Heap Sort 比較快；但當子陣列被切得很小（例如 $n < 20$）時，Heap Sort 維護樹狀結構的「常數開銷（Overhead）」反而太大，這時候直接用常數極小、免額外記憶體的 Insertion Sort 反而會反超。重點成果：實作出來後，你的實驗數據（例如 $n=1000$ 時）成功證明了 Composite 的速度超越了純 Heap Sort，達到了 1+1 > 2 的最佳化效果。
 
 **補充**
-Composite Sort 在 $n$ 很大時沒能超越 Quick Sort？最終數據中，會發現 Composite 雖然比 Heap 快，但依然比 Quick 慢。這是一個非常值得拿出來討論的科學現象：原因分析：Composite Sort 是基於「小於 20 切換成 Insertion，大於等於 20 使用 Heap」的邏輯。雖然 Heap Sort 的最壞情況是穩定的 $O(n \log n)$，但它在底層運算時需要频繁地進行樹狀結構的交換（MaxHeapify），這會破壞 CPU 的快取記憶體在地性（Cache Locality）。相較之下，Quick Sort 雖然也是 $O(n \log n)$，但它的雙指標分割（Partition）是連續線性掃描記憶體，對 CPU 快取極度友善。這證明了：時間複雜度相同的演算法，硬體架構上的常數開銷（Constant Factor）會大幅影響實際速度。
+
+Composite Sort 在 $n$ 很大時沒能超越 Quick Sort？最終數據中，會發現 Composite 雖然比 Heap 快，但依然比 Quick 慢。原因分析：Composite Sort 是基於「小於 20 切換成Insertion，大於等於 20 使用 Heap」的邏輯。雖然 Heap Sort 的最壞情況是穩定的 $O(n \log n)$，但它在底層運算時需要频繁地進行樹狀結構的交換（MaxHeapify），這會破壞 CPU 的快取記憶體在地性（Cache Locality）。相較之下，Quick Sort 雖然也是 $O(n \log n)$，但它的雙指標分割（Partition）是連續線性掃描記憶體，對 CPU 快取極度友善。這證明了：時間複雜度相同的演算法，硬體架構上的常數開銷（Constant Factor）會大幅影響實際速度。
 
 ### 實作上的困難點
 
